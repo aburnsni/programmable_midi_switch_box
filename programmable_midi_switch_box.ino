@@ -50,6 +50,16 @@ int notes[inputs] = {60, 62, 64, 65, 67, 69};
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
 
+// Initialise display
+Adafruit_PCD8544 display = Adafruit_PCD8544(7, 6, 5, 4,3 ); //Download the latest Adafruit Library in order to use this constructor
+bool backlight = true;
+int contrast = 60;
+const int backlightPin = 8;
+
+// Menu
+int page = 1;
+
+
 void setup() {
   MIDI.begin();
   Serial.begin(9600);
@@ -82,9 +92,24 @@ void setup() {
   pinMode(ledLatchPin, OUTPUT);
   pinMode(ledDataPin, OUTPUT);
 
-  Serial.print("Name");
-  Serial.print("\t");
-  Serial.println("Value");
+  // display
+  pinMode(backlightPin, OUTPUT);
+  turnBacklightOn();
+  
+  display.begin();
+  display.clearDisplay();
+  display.setContrast(contrast);
+  display.display();
+
+
+//debug info to Serial
+  for (int i = 0; i< inputs; i++) {
+    Serial.print(notes[i]);
+    Serial.print("\t");
+  }
+  Serial.println();
+
+  updateDisplay();
 }
 void loop () {
   for (uint8_t i = 0; i < inputs; i++) {
@@ -128,11 +153,89 @@ void isr() {
   }
 }
 
-void turnonLED(int button) {
+void turnBacklightOn() {
+  digitalWrite(backlightPin, LOW);
+}
 
+void turnBacklightOff() {
+  digitalWrite(backlightPin, HIGH);
+}
+
+void turnonLED(int button) {
+  
 }
 
 void turnoffLED(int button) {
 
 }
 
+void updateDisplay() {
+    display.setTextSize(1);
+    display.clearDisplay();
+
+    display.setCursor(1,3);
+    display.setTextColor(BLACK);
+    display.print("Select Switch");
+
+    if (virtualPosition !=0) {
+      display.drawRect(0, 13, 29, 18, BLACK);
+      display.setTextColor(BLACK, WHITE);
+    } else {
+      display.fillRect(0, 13, 29, 18, BLACK);
+      display.setTextColor(WHITE, BLACK);
+    }
+    display.setCursor(11 , 18);
+    display.print("1");
+
+    if (virtualPosition !=1) {
+      display.drawRect(28, 13, 29, 18, BLACK);
+      display.setTextColor(BLACK, WHITE);
+    } else {
+      display.fillRect(28, 13, 29, 18, BLACK);
+      display.setTextColor(WHITE,BLACK);
+    }
+    display.setCursor(39 , 18);
+    display.print("2");
+
+    if (virtualPosition !=2) {
+      display.drawRect(56, 13, 28, 18, BLACK);
+      display.setTextColor(BLACK, WHITE);
+    } else {
+      display.fillRect(56, 13, 28, 18, BLACK);
+      display.setTextColor(WHITE, BLACK);
+    }
+    display.setCursor(67 , 18);
+    display.print("3");
+
+    if (virtualPosition !=3) {
+      display.drawRect(0, 30, 29, 18, BLACK);
+      display.setTextColor(BLACK, WHITE);
+    } else {
+      display.fillRect(0, 30, 29, 18, BLACK);
+      display.setTextColor(WHITE, BLACK);
+    }
+    display.setCursor(11 , 35);
+    display.print("4");
+
+    if (virtualPosition !=4) {
+      display.drawRect(28, 30, 29, 18, BLACK);
+      display.setTextColor(BLACK, WHITE);
+    } else {
+      display.fillRect(28, 30, 29, 18, BLACK);
+      display.setTextColor(WHITE, BLACK);
+    }
+    display.setCursor(39 , 35);
+    display.print("5");
+
+    if (virtualPosition !=5) {
+      display.drawRect(56, 30, 28, 18, BLACK);
+      display.setTextColor(BLACK, WHITE);
+    } else {
+      display.fillRect(56, 30, 28, 18, BLACK);
+      display.setTextColor(WHITE, BLACK);
+    }
+    display.setCursor(67 , 35);
+    display.print("6");
+
+   display.display();
+}
