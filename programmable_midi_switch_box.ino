@@ -1,8 +1,8 @@
 // MIDI tx
-// lcd pins 3, 4, 5, 6, 7, 8
-// rotary enc pins 2, A6, A7
+// lcd pins 4, 5, 6, 7, 8, 9
+// rotary enc pins 2, 3, A7
 // switch inputs A0, A1, A2, A3, A4, A5
-// hc595 driven leds 9, 10, 11
+// hc595 driven leds 10, 11, 12
 #include <MIDI.h>
 #include <EEPROM.h>
 #include <SPI.h>
