@@ -23,6 +23,9 @@ const int encDt = A6;
 const int encSw = A7;
 bool up = false;
 bool down = false;
+int lastCount = 0;
+volatile int virtualPosition = 0;
+bool swState = true;
 
 // Pins for hc595 to drive LEDs
 const int ledClockPin = 9;
@@ -111,7 +114,22 @@ void setup() {
 
   updateDisplay();
 }
+
 void loop () {
+  if (virtualPosition != lastCount) {
+    Serial.print(virtualPosition > lastCount ? "Up :" : "Down :");
+    Serial.println(virtualPosition);
+    // byte bits = myfnNumToBits(virtualPosition) ;
+    // myfnUpdateDisplay(bits);    // display alphanumeric digit
+    lastCount = virtualPosition;
+    updateDisplay();
+  }
+
+  swState = digitalRead(encSw);
+  if (swState == LOW) {
+    // modeSelect();
+  }
+
   for (uint8_t i = 0; i < inputs; i++) {
     buttonState[i] = digitalRead(inputPin[i]);
     if ((buttonState[i] == HIGH) && (playing[i] == false) && (millis() - lasttrig[i] > debounce)) {
@@ -141,14 +159,14 @@ void isr() {
   // Debounce signals to 5ms
   if (interuptTime - lastInterupTime > 5) {
     if (digitalRead(encDt) == LOW) {
-      up = true;
-      down = false;
+      virtualPosition--;
     } else {
-      up = false;
-      down = true;
+      virtualPosition++;
     }
     //Restrict rotary encoder values
-    //    virtualPosition = min(maxValue-1, max(0, virtualPosition));
+    if (page == 1) {
+      virtualPosition = min(inputs-1, max(0, virtualPosition));
+    }
     lastInterupTime = interuptTime;
   }
 }
