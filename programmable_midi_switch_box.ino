@@ -19,7 +19,7 @@ unsigned long debounce = 10;
 
 // Variables for rotary encoder
 const int encClk = 2; // Needs Interupt pin
-const int encDt = A6;
+const int encDt = 3;
 const int encSw = A7;
 bool up = false;
 bool down = false;
@@ -28,9 +28,9 @@ volatile int virtualPosition = 0;
 bool swState = true;
 
 // Pins for hc595 to drive LEDs
-const int ledClockPin = 9;
-const int ledLatchPin = 10;
-const int ledDataPin = 11;
+const int ledClockPin = 10;
+const int ledLatchPin = 11;
+const int ledDataPin = 12;
 
 // Note names matched to MIDI value
 int midiChannel = 1;
@@ -54,10 +54,10 @@ int notes[inputs] = {60, 62, 64, 65, 67, 69};
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
 
 // Initialise display
-Adafruit_PCD8544 display = Adafruit_PCD8544(7, 6, 5, 4,3 ); //Download the latest Adafruit Library in order to use this constructor
+Adafruit_PCD8544 display = Adafruit_PCD8544(8, 7, 6, 5, 4 ); //Download the latest Adafruit Library in order to use this constructor
 bool backlight = true;
 int contrast = 60;
-const int backlightPin = 8;
+const int backlightPin = 9;
 
 // Menu
 int page = 1;
@@ -159,9 +159,9 @@ void isr() {
   // Debounce signals to 5ms
   if (interuptTime - lastInterupTime > 5) {
     if (digitalRead(encDt) == LOW) {
-      virtualPosition--;
-    } else {
       virtualPosition++;
+    } else {
+      virtualPosition--;
     }
     //Restrict rotary encoder values
     if (page == 1) {
