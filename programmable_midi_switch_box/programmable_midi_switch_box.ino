@@ -10,27 +10,27 @@
 #include <Adafruit_PCD8544.h>
 
 //Variables for inputs
-const int inputs = 6;
-const int inputPin[inputs] = {A0, A1, A2, A3, A4, A5};
-int buttonState[inputs] = {1, 1, 1, 1, 1, 1};
+const uint8_t inputs = 6;
+const uint8_t inputPin[inputs] = {A0, A1, A2, A3, A4, A5};
+bool buttonState[inputs] = {1, 1, 1, 1, 1, 1};
 bool playing[inputs] = {false, false, false, false, false, false};  //Is note currently playing
 unsigned long lasttrig[inputs];
-unsigned long debounce = 10;
+uint8_t debounce = 10;
 
 // Variables for rotary encoder
-const int encClk = 2; // Needs Interupt pin
-const int encDt = 3;
-const int encSw = A7;
+const uint8_t encClk = 2; // Needs Interupt pin
+const uint8_t encDt = 3;
+const uint8_t encSw = 12;
 bool up = false;
 bool down = false;
-int lastCount = 0;
-volatile int virtualPosition = 0;
+uint8_t lastCount = 0;
+volatile uint8_t virtualPosition = 0;
 bool swState = true;
 
 // Pins for hc595 to drive LEDs
-const int ledClockPin = 10;
-const int ledLatchPin = 11;
-const int ledDataPin = 12;
+const uint8_t ledClockPin = 10;
+const uint8_t ledLatchPin = 11;
+const uint8_t ledDataPin = 12;
 
 // Note names matched to MIDI value
 int midiChannel = 1;
@@ -46,38 +46,39 @@ String noteName[numNotes] = {
 };
 
 // temp value for EEPROM reading
-int value;
+uint8_t value;
 
 // default MIDI notes - replaced from EEPROM
-int notes[inputs] = {60, 62, 64, 65, 67, 69};
+uint8_t notes[inputs] = {60, 62, 64, 65, 67, 69};
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
 
 // Initialise display
 Adafruit_PCD8544 display = Adafruit_PCD8544(8, 7, 6, 5, 4 ); //Download the latest Adafruit Library in order to use this constructor
 bool backlight = true;
-int contrast = 60;
-const int backlightPin = 9;
+uint8_t contrast = 60;
+const uint8_t backlightPin = 9;
 
 // Menu
-int page = 1;
+uint8_t page = 1;
+uint8_t selected;
 
 
 void setup() {
   MIDI.begin();
   Serial.begin(9600);
   // Switch inputs with pullups
-  for (int i = 0; i < inputs; i++) {
+  for (uint8_t i = 0; i < inputs; i++) {
     pinMode (inputPin[i], INPUT_PULLUP);
   }
 
   // Set last trigger time for each input
-  for (int i = 0; i < inputs; i++) {
+  for (uint8_t i = 0; i < inputs; i++) {
     lasttrig[i] = millis();
   }
 
   //read EEPROM values
-  for (int i = 0; i < inputs; i++) {
+  for (uint8_t i = 0; i < inputs; i++) {
     value = EEPROM.read(i);
     if (value > 11 && value < 128) {
       notes[i] = value;
@@ -106,7 +107,7 @@ void setup() {
 
 
 //debug info to Serial
-  for (int i = 0; i< inputs; i++) {
+  for (uint8_t i = 0; i< inputs; i++) {
     Serial.print(notes[i]);
     Serial.print("\t");
   }
@@ -179,11 +180,11 @@ void turnBacklightOff() {
   digitalWrite(backlightPin, HIGH);
 }
 
-void turnonLED(int button) {
+void turnonLED(uint8_t button) {
   
 }
 
-void turnoffLED(int button) {
+void turnoffLED(uint8_t button) {
 
 }
 
