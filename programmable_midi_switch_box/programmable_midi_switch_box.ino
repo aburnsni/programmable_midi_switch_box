@@ -33,9 +33,10 @@ const uint8_t ledLatchPin = 11;
 const uint8_t ledDataPin = 12;
 
 // Note names matched to MIDI value
-int midiChannel = 1;
-const int numNotes = 84;
+uint8_t midiChannel = 1;
+const uint8_t numNotes = 96;
 String noteName[numNotes] = {
+  "", "", "", "", "", "", "", "", "", "", "", "",
   "", "", "", "", "", "", "", "", "", "", "", "",
   "C0", "C#0", "D0", "Eb0", "E0", "F0", "F#0", "G0", "G#0", "A0", "Bb0", "B0",
   "C1", "C#1", "D1", "Eb1", "E1", "F1", "F#1", "G1", "G#1", "A1", "Bb1", "B1",
