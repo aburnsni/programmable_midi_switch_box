@@ -135,13 +135,13 @@ void loop () {
 
   for (uint8_t i = 0; i < inputs; i++) {
     buttonState[i] = digitalRead(inputPin[i]);
-    if ((buttonState[i] == HIGH) && (playing[i] == false) && (millis() - lasttrig[i] > debounce)) {
+    if ((buttonState[i] == LOW) && (playing[i] == false) && (millis() - lasttrig[i] > debounce)) {
       // turn LED on:
       turnonLED(i);
       MIDI.sendNoteOn(notes[i], 100, midiChannel);
       playing[i] = true;
       lasttrig[i] = millis();
-    } else if ((buttonState[i] == LOW) && (playing[i] == true)) {
+    } else if ((buttonState[i] == HIGH) && (playing[i] == true)) {
       // turn LED off:
       turnoffLED(i);
       MIDI.sendNoteOff(notes[i], 100, midiChannel);
