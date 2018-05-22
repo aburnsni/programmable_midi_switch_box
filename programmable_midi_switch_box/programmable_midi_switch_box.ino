@@ -129,9 +129,17 @@ void loop () {
   }
 
   swState = digitalRead(encSw);
-  if (swState == LOW) {
+  if (swState == LOW && page == 1) {
     // modeSelect();
-  }
+      page = 2;
+      selected = virtualPosition;
+      Serial.println(selected+1);
+      delay(100);
+      updateDisplay();
+    } else if (swState == LOW && page ==2) {
+      page = 1;
+      updateDisplay();
+    }
 
   for (uint8_t i = 0; i < inputs; i++) {
     buttonState[i] = digitalRead(inputPin[i]);
