@@ -31,6 +31,7 @@ bool swState = true;
 const uint8_t ledClockPin = 10;
 const uint8_t ledLatchPin = 11;
 const uint8_t ledDataPin = 12;
+byte ledBits = B00000000;
 
 // Note names matched to MIDI value
 uint8_t midiChannel = 1;
@@ -182,11 +183,17 @@ void turnBacklightOff() {
 }
 
 void turnonLED(uint8_t button) {
-  
+  ledBits = ledBits | myfnNumToBits(button) ;
+  digitalWrite(ledLatchPin, LOW);  // prepare shift register for data
+  shiftOut(ledDataPin, ledClockPin, LSBFIRST, ledBits); // send data  LSBFIRST so uses outputs QB to QH (pins 2-7)
+  digitalWrite(ledLatchPin, HIGH); // update display
 }
 
 void turnoffLED(uint8_t button) {
-
+  ledBits = ledBits ^ myfnNumToBits(button) ;
+  digitalWrite(ledLatchPin, LOW);  // prepare shift register for data
+  shiftOut(ledDataPin, ledClockPin, LSBFIRST, ledBits); // send data
+  digitalWrite(ledLatchPin, HIGH); // update display
 }
 
 void updateDisplay() {
@@ -273,4 +280,30 @@ void updateDisplay() {
     
   }
   display.display();
+}
+
+byte myfnNumToBits(int someNumber) {
+  switch (someNumber) {
+    case 0:
+      return B00000001;
+      break;
+    case 1:
+      return B00000010;
+      break;
+    case 2:
+      return B00000100;
+      break;
+    case 3:
+      return B00001000;
+      break;
+    case 4:
+      return B00010000;
+      break;
+    case 5:
+      return B00100000;
+      break;
+    default:
+      return B00000000; // Error condition, displays three vertical bars
+      break;   
+  }
 }
