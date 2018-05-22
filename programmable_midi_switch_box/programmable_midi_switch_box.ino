@@ -20,7 +20,7 @@ uint8_t debounce = 10;
 // Variables for rotary encoder
 const uint8_t encClk = 2; // Needs Interupt pin
 const uint8_t encDt = 3;
-const uint8_t encSw = 12;
+const uint8_t encSw = 4;
 bool up = false;
 bool down = false;
 uint8_t lastCount = 0;
@@ -28,9 +28,9 @@ volatile uint8_t virtualPosition = 0;
 bool swState = true;
 
 // Pins for hc595 to drive LEDs
-const uint8_t ledClockPin = 9;
-const uint8_t ledLatchPin = 10;
-const uint8_t ledDataPin = 11;
+const uint8_t ledClockPin = 10;
+const uint8_t ledLatchPin = 11;
+const uint8_t ledDataPin = 12;
 
 // Note names matched to MIDI value
 uint8_t midiChannel = 1;
@@ -55,10 +55,10 @@ uint8_t notes[inputs] = {60, 61, 13, 65, 67, 69};
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
 
 // Initialise display
-Adafruit_PCD8544 display = Adafruit_PCD8544(7, 6, 5, 4); // pin CS (labelled CE) tied to GND
+Adafruit_PCD8544 display = Adafruit_PCD8544(8, 7, 6, 5); // pin CS (labelled CE) tied to GND
 bool backlight = true;
 uint8_t contrast = 60;
-const uint8_t backlightPin = 8;
+const uint8_t backlightPin = 9;
 
 // Menu
 uint8_t page = 1;
