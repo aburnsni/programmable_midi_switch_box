@@ -34,10 +34,10 @@ const uint8_t ledDataPin = 11;
 
 // Note names matched to MIDI value
 uint8_t midiChannel = 1;
-const uint8_t numNotes = 96;
-String noteName[numNotes] = {
-  "", "", "", "", "", "", "", "", "", "", "", "",
-  "", "", "", "", "", "", "", "", "", "", "", "",
+const uint8_t numNotes = 84;
+const uint8_t noteOffset = 12;
+char noteName[numNotes][5] = { // Add 12 to index to get MIDI note
+  "C-1", "C#-1", "D-1", "Eb-1", "E-1", "F-1", "F#-1", "G-1", "G#-1", "A-1", "Bb-1", "B-1",
   "C0", "C#0", "D0", "Eb0", "E0", "F0", "F#0", "G0", "G#0", "A0", "Bb0", "B0",
   "C1", "C#1", "D1", "Eb1", "E1", "F1", "F#1", "G1", "G#1", "A1", "Bb1", "B1",
   "C2", "C#2", "D2", "Eb2", "E2", "F2", "F#2", "G2", "G#2", "A2", "Bb2", "B2",
@@ -50,7 +50,7 @@ String noteName[numNotes] = {
 uint8_t value;
 
 // default MIDI notes - replaced from EEPROM
-uint8_t notes[inputs] = {60, 62, 64, 65, 67, 69};
+uint8_t notes[inputs] = {60, 61, 13, 65, 67, 69};
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
 
