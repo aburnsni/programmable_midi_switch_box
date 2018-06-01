@@ -9,6 +9,8 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_PCD8544.h>
 
+const bool DEBUG = 0;
+
 //Variables for inputs
 const uint8_t inputs = 6;
 const uint8_t inputPin[inputs] = {A0, A1, A2, A3, A4, A5};
@@ -21,10 +23,15 @@ uint8_t debounce = 10;
 const uint8_t encClk = 2; // Needs Interupt pin
 const uint8_t encDt = 3;
 const uint8_t encSw = 4;
-bool up = false;
-bool down = false;
+
+volatile boolean up = false;
+volatile boolean down = false;
+volatile boolean middle = false;
+int selectButtonState = 0;
+int lastSelectButtonState = 0;
+
 uint8_t lastCount = 0;
-volatile uint8_t virtualPosition = 0;
+// volatile uint8_t virtualPosition = 0;
 bool swState = true;
 
 // Pins for hc595 to drive LEDs
@@ -63,12 +70,13 @@ const uint8_t backlightPin = 9;
 
 // Menu
 uint8_t page = 1;
-uint8_t selected;
-
+uint8_t menuitem = 0;
 
 void setup() {
   MIDI.begin();
-  Serial.begin(9600);
+  if (DEBUG) {
+    Serial.begin(115200);
+  }
   // Switch inputs with pullups
   for (uint8_t i = 0; i < inputs; i++) {
     pinMode (inputPin[i], INPUT_PULLUP);
@@ -109,43 +117,70 @@ void setup() {
 
 
 //debug info to Serial
-  for (uint8_t i = 0; i< inputs; i++) {
-    Serial.print(notes[i]);
-    Serial.print("\t");
+  if (DEBUG) {
+    for (uint8_t i = 0; i< inputs; i++) {
+      Serial.print(notes[i]);
+      Serial.print("\t");
+    }
+    Serial.println();
   }
-  Serial.println();
-
   updateDisplay();
 }
 
 void loop () {
-  if (virtualPosition != lastCount) {
-    Serial.print(virtualPosition > lastCount ? "Up :" : "Down :");
-    Serial.println(virtualPosition);
-    // byte bits = myfnNumToBits(virtualPosition) ;
-    // myfnUpdateDisplay(bits);    // display alphanumeric digit
-    lastCount = virtualPosition;
-    updateDisplay();
+  updateDisplay();
+
+  selectButtonState = digitalRead(encSw);
+  checkIfSelectButtonIsPressed();
+
+  if (up && page == 1) {
+    up = false;
+    if (menuitem < inputs-1) {
+      menuitem++;
+    }
+  } else if (up && page == 2) {
+    up = false;
+    if (notes[menuitem] < 95) {
+      notes[menuitem]++;
+    }
   }
 
-  swState = digitalRead(encSw);
-  if (swState == LOW && page == 1) {
-    // modeSelect();
-      page = 2;
-      selected = virtualPosition;
-      Serial.println(selected+1);
-      delay(100);
-      updateDisplay();
-    } else if (swState == LOW && page ==2) {
-      page = 1;
-      updateDisplay();
+  if (down && page == 1 && menuitem >= 0) {
+    down = false;
+    if (menuitem > 0) {
+      menuitem--;
     }
+  } else if (down && page == 2) {
+    down = false;
+    if (notes[menuitem] > 12) {
+      notes[menuitem]--;
+    }
+  }
 
+  if (middle) {
+    middle = false;
+    if (page == 1 ) {
+      page=2;
+    } else if (page ==2) {
+      page = 1;
+      //write value to EEPROM
+      if (DEBUG) {
+        Serial.print("Writing value ");
+        Serial.print(notes[menuitem]);
+        Serial.print(" to ");
+        Serial.println(menuitem);
+      }
+      EEPROM.update(menuitem, notes[menuitem]);
+    }
+  }
+
+  // MIDI play
   for (uint8_t i = 0; i < inputs; i++) {
     buttonState[i] = digitalRead(inputPin[i]);
     if ((buttonState[i] == LOW) && (playing[i] == false) && (millis() - lasttrig[i] > debounce)) {
       // turn LED on:
       turnonLED(i);
+      
       MIDI.sendNoteOn(notes[i], 100, midiChannel);
       playing[i] = true;
       lasttrig[i] = millis();
@@ -156,10 +191,6 @@ void loop () {
       playing[i] = false;
     }
   }
-
-
-  //write value to EEPROM
-  // EEPROM.update(address, value)
 }
 
 // Interupt routine for rotary enconder
@@ -170,16 +201,30 @@ void isr() {
   // Debounce signals to 5ms
   if (interuptTime - lastInterupTime > 5) {
     if (digitalRead(encDt) == LOW) {
-      virtualPosition++;
+      // virtualPosition++;
+      up = true;
     } else {
-      virtualPosition--;
+      // virtualPosition--;
+      down = true;
     }
-    //Restrict rotary encoder values
-    if (page == 1) {
-      virtualPosition = min(inputs-1, max(0, virtualPosition));
-    }
+    // //Restrict rotary encoder values
+    // if (page == 1) {
+    //   virtualPosition = min(inputs-1, max(0, virtualPosition));
+    // }
     lastInterupTime = interuptTime;
   }
+}
+
+void checkIfSelectButtonIsPressed()
+{
+   if (selectButtonState != lastSelectButtonState) 
+  {
+    if (selectButtonState == 0) {
+      middle=true;
+    }
+    delay(50);
+  }
+   lastSelectButtonState = selectButtonState;
 }
 
 void turnBacklightOn() {
@@ -213,7 +258,7 @@ void updateDisplay() {
       display.setTextColor(BLACK);
       display.print("Select Switch");
 
-      if (virtualPosition !=0) {
+      if (menuitem !=0) {
         display.drawRect(0, 13, 29, 18, BLACK);
         display.setTextColor(BLACK, WHITE);
       } else {
@@ -223,7 +268,7 @@ void updateDisplay() {
       display.setCursor(11 , 18);
       display.print("1");
 
-      if (virtualPosition !=1) {
+      if (menuitem !=1) {
         display.drawRect(28, 13, 29, 18, BLACK);
         display.setTextColor(BLACK, WHITE);
       } else {
@@ -233,7 +278,7 @@ void updateDisplay() {
       display.setCursor(39 , 18);
       display.print("2");
 
-      if (virtualPosition !=2) {
+      if (menuitem !=2) {
         display.drawRect(56, 13, 28, 18, BLACK);
         display.setTextColor(BLACK, WHITE);
       } else {
@@ -243,7 +288,7 @@ void updateDisplay() {
       display.setCursor(67 , 18);
       display.print("3");
 
-      if (virtualPosition !=3) {
+      if (menuitem !=3) {
         display.drawRect(0, 30, 29, 18, BLACK);
         display.setTextColor(BLACK, WHITE);
       } else {
@@ -253,7 +298,7 @@ void updateDisplay() {
       display.setCursor(11 , 35);
       display.print("4");
 
-      if (virtualPosition !=4) {
+      if (menuitem !=4) {
         display.drawRect(28, 30, 29, 18, BLACK);
         display.setTextColor(BLACK, WHITE);
       } else {
@@ -263,7 +308,7 @@ void updateDisplay() {
       display.setCursor(39 , 35);
       display.print("5");
 
-      if (virtualPosition !=5) {
+      if (menuitem !=5) {
         display.drawRect(56, 30, 28, 18, BLACK);
         display.setTextColor(BLACK, WHITE);
       } else {
@@ -277,14 +322,13 @@ void updateDisplay() {
     display.setCursor(18,3);
     display.setTextColor(BLACK);
     display.print("Switch:");
-    display.print(selected+1);
+    display.print(menuitem+1);
 
     display.drawRect(0, 13, 84, 35, BLACK);
-    uint8_t nameLength = strlen(noteName[notes[selected]-noteOffset]);
-    Serial.println(nameLength);
+    uint8_t nameLength = strlen(noteName[notes[menuitem]-noteOffset]);
     display.setCursor((84-(nameLength*noteOffset))/2,23);  // (84 - (size*12)) /2  , ((48-14) -16) /2) + 14
     display.setTextSize(2);
-    display.print(noteName[notes[selected]-noteOffset]);
+    display.print(noteName[notes[menuitem]-noteOffset]);
     
   }
   display.display();
