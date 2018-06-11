@@ -8,6 +8,7 @@
 #include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_PCD8544.h>
+#include "DualFunctionButton.h"
 
 const bool DEBUG = 0;
 
@@ -27,8 +28,9 @@ const uint8_t encSw = 4;
 volatile boolean up = false;
 volatile boolean down = false;
 volatile boolean middle = false;
-int selectButtonState = 0;
-int lastSelectButtonState = 0;
+// int selectButtonState = 0;
+// int lastSelectButtonState = 0;
+DualFunctionButton button(encSw, 1000, INPUT_PULLUP);
 
 uint8_t lastCount = 0;
 // volatile uint8_t virtualPosition = 0;
@@ -42,6 +44,7 @@ byte ledBits = B00000000;
 
 // Note names matched to MIDI value
 uint8_t midiChannel = 1;
+uint8_t midiAddress = inputs; //use address space after inputs
 const uint8_t numNotes = 84;
 const uint8_t noteOffset = 12;
 char noteName[numNotes][5] = { // Add 12 to index to get MIDI note
@@ -94,6 +97,10 @@ void setup() {
       notes[i] = value;
     }
   }
+  value = EEPROM.read(midiAddress);
+  if (value >= 1 && value <=16) { //valid midiChannel
+    midiChannel = value;
+  }
 
   // rotary encoder I/Os
   pinMode(encClk, INPUT);
@@ -123,6 +130,8 @@ void setup() {
       Serial.print("\t");
     }
     Serial.println();
+    Serial.print("MIDI channel: ");
+    Serial.println(midiChannel);
   }
   updateDisplay();
 }
@@ -130,8 +139,8 @@ void setup() {
 void loop () {
   updateDisplay();
 
-  selectButtonState = digitalRead(encSw);
-  checkIfSelectButtonIsPressed();
+  // selectButtonState = digitalRead(encSw);
+  // checkIfSelectButtonIsPressed();
 
   if (up && page == 1) {
     up = false;
@@ -142,6 +151,11 @@ void loop () {
     up = false;
     if (notes[menuitem] < 95) {
       notes[menuitem]++;
+    }
+  } else if (up && page == 3) {
+    up = false;
+    if (midiChannel < 16) {
+      midiChannel++;
     }
   }
 
@@ -155,10 +169,14 @@ void loop () {
     if (notes[menuitem] > 12) {
       notes[menuitem]--;
     }
+  } else if (down && page == 3) {
+    down = false;
+    if (midiChannel > 1) {
+      midiChannel--;
+    }
   }
 
-  if (middle) {
-    middle = false;
+  if (button.shortPress()) {
     if (page == 1 ) {
       page=2;
     } else if (page ==2) {
@@ -171,8 +189,38 @@ void loop () {
         Serial.println(menuitem);
       }
       EEPROM.update(menuitem, notes[menuitem]);
+    } else if (page ==3) {
+      page = 1;
+      //write value to EEPROM
+      if (DEBUG) {
+        Serial.print("Writing MIDI channel value ");
+        Serial.println(midiChannel);
+      }
+      EEPROM.update(midiAddress, midiChannel);
     }
   }
+  if (button.longPress() && page == 1) {
+    if (DEBUG) {
+      Serial.println("Long Press");
+    }
+    page = 3;
+  }
+  // if (middle) {
+  //   middle = false;
+  //   if (page == 1 ) {
+  //     page=2;
+  //   } else if (page ==2) {
+  //     page = 1;
+  //     //write value to EEPROM
+  //     if (DEBUG) {
+  //       Serial.print("Writing value ");
+  //       Serial.print(notes[menuitem]);
+  //       Serial.print(" to ");
+  //       Serial.println(menuitem);
+  //     }
+  //     EEPROM.update(menuitem, notes[menuitem]);
+  //   }
+  // }
 
   // MIDI play
   for (uint8_t i = 0; i < inputs; i++) {
@@ -215,17 +263,17 @@ void isr() {
   }
 }
 
-void checkIfSelectButtonIsPressed()
-{
-   if (selectButtonState != lastSelectButtonState) 
-  {
-    if (selectButtonState == 0) {
-      middle=true;
-    }
-    delay(50);
-  }
-   lastSelectButtonState = selectButtonState;
-}
+// void checkIfSelectButtonIsPressed()
+// {
+//    if (selectButtonState != lastSelectButtonState) 
+//   {
+//     if (selectButtonState == 0) {
+//       middle=true;
+//     }
+//     delay(50);
+//   }
+//    lastSelectButtonState = selectButtonState;
+// }
 
 void turnBacklightOn() {
   digitalWrite(backlightPin, LOW);
@@ -254,7 +302,7 @@ void updateDisplay() {
     display.clearDisplay();
 
     if (page == 1) {
-      display.setCursor(1,3);
+      display.setCursor(3,3);
       display.setTextColor(BLACK);
       display.print("Select Switch");
 
@@ -319,7 +367,7 @@ void updateDisplay() {
       display.print("6");
 
   } else if (page == 2) {
-    display.setCursor(18,3);
+    display.setCursor(19,3);
     display.setTextColor(BLACK);
     display.print("Switch:");
     display.print(menuitem+1);
@@ -330,6 +378,17 @@ void updateDisplay() {
     display.setTextSize(2);
     display.print(noteName[notes[menuitem]-noteOffset]);
     
+  } else if (page == 3) {
+    display.setCursor(8,3);
+    display.setTextColor(BLACK);
+    display.print("MIDI channel");
+    display.drawRect(0, 13, 84, 35, BLACK);
+    display.setCursor(30,23);
+    display.setTextSize(2);
+    if (midiChannel < 10) {
+      display.print("0");
+    }
+    display.print(midiChannel);
   }
   display.display();
 }
