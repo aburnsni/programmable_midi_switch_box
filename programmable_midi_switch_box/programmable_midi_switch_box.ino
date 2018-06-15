@@ -77,6 +77,15 @@ uint8_t page = 1;
 uint8_t menuitem = 0;
 
 void setup() {
+  // hc595 I/Os
+  pinMode(ledClockPin, OUTPUT);
+  pinMode(ledLatchPin, OUTPUT);
+  pinMode(ledDataPin, OUTPUT);
+  // reset leds ASAP
+  digitalWrite(ledLatchPin, LOW);  // prepare shift register for data
+  shiftOut(ledDataPin, ledClockPin, LSBFIRST, B00000000); // send data
+  digitalWrite(ledLatchPin, HIGH); // update display
+
   MIDI.begin();
   if (DEBUG) {
     Serial.begin(115200);
@@ -110,11 +119,6 @@ void setup() {
   pinMode(encDt, INPUT);
   pinMode(encSw, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(encClk), isr, LOW);
-
-  // hc595 I/Os
-  pinMode(ledClockPin, OUTPUT);
-  pinMode(ledLatchPin, OUTPUT);
-  pinMode(ledDataPin, OUTPUT);
 
   // display
   pinMode(backlightPin, OUTPUT);
