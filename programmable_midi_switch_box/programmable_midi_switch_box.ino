@@ -43,7 +43,7 @@ const uint8_t ledDataPin = 12;
 byte ledBits = B00000000;
 
 // Note names matched to MIDI value
-uint8_t midiChannel = 1;
+// uint8_t midiChannel = 1;
 uint8_t midiAddress = inputs; //use address space after inputs
 const uint8_t numNotes = 84;
 const uint8_t noteOffset = 12;
@@ -62,6 +62,7 @@ uint8_t value;
 
 // default MIDI notes - replaced from EEPROM
 uint8_t notes[inputs] = {60, 61, 13, 65, 67, 69};
+uint8_t midiChannels[inputs] = {1, 1, 1, 1, 1, 1};
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
 
@@ -97,9 +98,11 @@ void setup() {
       notes[i] = value;
     }
   }
-  value = EEPROM.read(midiAddress);
-  if (value >= 1 && value <=16) { //valid midiChannel
-    midiChannel = value;
+  for (uint8_t i = 0; i < inputs; i++) {
+    value = EEPROM.read(midiAddress + i);
+    if (value >= 1 && value <=16) { //valid midiChannel
+      midiChannels[i] = value;
+    }
   }
 
   // rotary encoder I/Os
@@ -125,15 +128,21 @@ void setup() {
 
 //debug info to Serial
   if (DEBUG) {
+    Serial.println ("Notes:");
     for (uint8_t i = 0; i< inputs; i++) {
       Serial.print(notes[i]);
       Serial.print("\t");
     }
     Serial.println();
-    Serial.print("MIDI channel: ");
-    Serial.println(midiChannel);
+    Serial.println("MIDI channels:");
+    for (uint8_t i = 0; i< inputs; i++) {
+      Serial.print(midiChannels[i]);
+      Serial.print("\t");
+    }
+    Serial.println();
   }
   updateDisplay();
+
 }
 
 void loop () {
@@ -154,8 +163,9 @@ void loop () {
     }
   } else if (up && page == 3) {
     up = false;
-    if (midiChannel < 16) {
-      midiChannel++;
+    if (midiChannels[menuitem] < 16) {
+      midiChannels[menuitem]++;
+      updateDisplay();
     }
   }
 
@@ -171,8 +181,9 @@ void loop () {
     }
   } else if (down && page == 3) {
     down = false;
-    if (midiChannel > 1) {
-      midiChannel--;
+    if (midiChannels[menuitem] > 1) {
+      midiChannels[menuitem]--;
+      updateDisplay();
     }
   }
 
@@ -194,12 +205,14 @@ void loop () {
       //write value to EEPROM
       if (DEBUG) {
         Serial.print("Writing MIDI channel value ");
-        Serial.println(midiChannel);
+        Serial.print(midiChannels[menuitem]);
+        Serial.print(" to ");
+        Serial.println(menuitem);
       }
-      EEPROM.update(midiAddress, midiChannel);
+      EEPROM.update(midiAddress + menuitem, midiChannels[menuitem]);
     }
   }
-  if (button.longPress() && page == 1) {
+  if (button.longPress() && page == 2) {
     if (DEBUG) {
       Serial.println("Long Press");
     }
@@ -228,14 +241,23 @@ void loop () {
     if ((buttonState[i] == LOW) && (playing[i] == false) && (millis() - lasttrig[i] > debounce)) {
       // turn LED on:
       turnonLED(i);
-      
-      MIDI.sendNoteOn(notes[i], 100, midiChannel);
+      if (!DEBUG) {
+        MIDI.sendNoteOn(notes[i], 100, midiChannels[i]);
+      } else {
+         Serial.print("ON: ");
+         Serial.println(notes[i]);
+       } 
       playing[i] = true;
       lasttrig[i] = millis();
     } else if ((buttonState[i] == HIGH) && (playing[i] == true)) {
       // turn LED off:
       turnoffLED(i);
-      MIDI.sendNoteOff(notes[i], 100, midiChannel);
+       if (!DEBUG) {
+        MIDI.sendNoteOff(notes[i], 100, midiChannels[i]);
+       } else {
+         Serial.print("OFF: ");
+         Serial.println(notes[i]);
+       }  
       playing[i] = false;
     }
   }
@@ -379,16 +401,18 @@ void updateDisplay() {
     display.print(noteName[notes[menuitem]-noteOffset]);
     
   } else if (page == 3) {
-    display.setCursor(8,3);
+    display.setCursor(3,3);
     display.setTextColor(BLACK);
-    display.print("MIDI channel");
+    // display.print("MIDI channel");
+    display.print("MIDI ch Sw: ");
+    display.print(menuitem+1);
     display.drawRect(0, 13, 84, 35, BLACK);
     display.setCursor(30,23);
     display.setTextSize(2);
-    if (midiChannel < 10) {
+    if (midiChannels[menuitem] < 10) {
       display.print("0");
     }
-    display.print(midiChannel);
+    display.print(midiChannels[menuitem]);
   }
   display.display();
 }
