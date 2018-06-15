@@ -175,7 +175,9 @@ void setup() {
 }
 
 void loop () {
-  updateDisplay();
+  // if (up || down) {
+  //   updateDisplay();
+  // };
 
   // selectButtonState = digitalRead(encSw);
   // checkIfSelectButtonIsPressed();
@@ -184,11 +186,13 @@ void loop () {
     up = false;
     if (menuitem < inputs-1) {
       menuitem++;
+      updateDisplay();
     }
   } else if (up && page == 2) {
     up = false;
     if (notes[menuitem] < 95) {
       notes[menuitem]++;
+      updateDisplay();
     }
   } else if (up && page == 3) {
     up = false;
@@ -202,11 +206,13 @@ void loop () {
     down = false;
     if (menuitem > 0) {
       menuitem--;
+      updateDisplay();
     }
   } else if (down && page == 2) {
     down = false;
     if (notes[menuitem] > 12) {
       notes[menuitem]--;
+      updateDisplay();
     }
   } else if (down && page == 3) {
     down = false;
@@ -240,12 +246,14 @@ void loop () {
       }
       EEPROM.update(midiAddress + menuitem, midiChannels[menuitem]);
     }
+    updateDisplay();
   }
   if (button.longPress() && page == 2) {
     if (DEBUG) {
       Serial.println("Long Press");
     }
     page = 3;
+    updateDisplay();
   }
   // if (middle) {
   //   middle = false;
