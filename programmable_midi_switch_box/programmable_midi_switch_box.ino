@@ -71,6 +71,8 @@ Adafruit_PCD8544 display = Adafruit_PCD8544(8, 7, 6, 5); // pin CS (labelled CE)
 bool backlight = true;
 uint8_t contrast = 60;
 const uint8_t backlightPin = 9;
+unsigned long backlightTrig = millis();
+const int backlightTimeOut = 30 * 1000;  // 30 second timeout on backlight
 
 // Menu
 uint8_t page = 1;
@@ -298,6 +300,10 @@ void loop () {
       playing[i] = false;
     }
   }
+
+  if (millis()-backlightTrig > backlightTimeOut) {
+    turnBacklightOff();
+  }
 }
 
 // Interupt routine for rotary enconder
@@ -458,6 +464,9 @@ void updateDisplay() {
     display.print(midiChannels[menuitem]);
   }
   display.display();
+
+  backlightTrig = millis();  // Reset backlight timer each time the encoder triggers
+  turnBacklightOn();
 }
 
 byte myfnNumToBits(int someNumber) {
