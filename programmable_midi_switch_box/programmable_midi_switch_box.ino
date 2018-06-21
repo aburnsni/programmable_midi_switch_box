@@ -47,7 +47,7 @@ byte ledBits = B00000000;
 uint8_t midiAddress = inputs; //use address space after inputs
 const uint8_t numNotes = 84;
 const uint8_t noteOffset = 12;
-char noteName[numNotes][5] = { // Add 12 to index to get MIDI note
+const char noteName[numNotes][5] = { // Add 12 to index to get MIDI note
   "C-1", "C#-1", "D-1", "Eb-1", "E-1", "F-1", "F#-1", "G-1", "G#-1", "A-1", "Bb-1", "B-1",
   "C0", "C#0", "D0", "Eb0", "E0", "F0", "F#0", "G0", "G#0", "A0", "Bb0", "B0",
   "C1", "C#1", "D1", "Eb1", "E1", "F1", "F#1", "G1", "G#1", "A1", "Bb1", "B1",
