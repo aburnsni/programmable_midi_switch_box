@@ -238,7 +238,7 @@ void loop () {
       }
       EEPROM.update(menuitem, notes[menuitem]);
     } else if (page ==3) {
-      page = 2 //Return to Switch setting;
+      page = 2; //Return to Switch setting;
       //write value to EEPROM
       if (DEBUG) {
         Serial.print("Writing MIDI channel value ");
@@ -247,15 +247,22 @@ void loop () {
         Serial.println(menuitem);
       }
       EEPROM.update(midiAddress + menuitem, midiChannels[menuitem]);
+    } else if (page == 4) {
+      page = 1;
     }
     updateDisplay();
   }
-  if (button.longPress() && page == 2) {
+  if (button.longPress()) {
     if (DEBUG) {
       Serial.println("Long Press");
     }
-    page = 3;
+    if (page == 1) {
+      page = 4;
+    } else if (page == 2) {
+      page = 3;
+    }
     updateDisplay();
+
   }
   // if (middle) {
   //   middle = false;
@@ -468,6 +475,19 @@ void updateDisplay() {
       display.print("0");
     }
     display.print(midiChannels[menuitem]);
+  } else if (page == 4) {
+    display.setTextSize(1);
+    for (uint8_t i = 0; i < inputs; i++) {
+      display.setCursor(0,(i*8));
+      display.print(i);
+      display.setCursor(12,(i*8));
+      display.print(noteName[notes[i]-noteOffset]);
+      display.setCursor(36,(i*8));
+      if (midiChannels[menuitem] < 10) {
+        display.print("0");
+      }
+      display.print(midiChannels[i]);
+    }
   }
   display.display();
 
