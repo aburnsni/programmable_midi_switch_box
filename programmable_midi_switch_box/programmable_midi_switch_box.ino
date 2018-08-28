@@ -45,6 +45,7 @@ byte ledBits = B00000000;
 // Note names matched to MIDI value
 // uint8_t midiChannel = 1;
 uint8_t midiAddress = inputs; //use address space after inputs
+uint8_t volumeAddress = inputs*2; //use address space after inputs and channels
 const uint8_t numNotes = 84;
 const uint8_t noteOffset = 12;
 const char noteName[numNotes][5] = { // Add 12 to index to get MIDI note
@@ -63,6 +64,7 @@ uint8_t value;
 // default MIDI notes - replaced from EEPROM
 uint8_t notes[inputs] = {60, 61, 13, 65, 67, 69};
 uint8_t midiChannels[inputs] = {1, 1, 1, 1, 1, 1};
+uint8_t volumes[inputs] = {100, 100, 100, 100, 100, 100};
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
 
@@ -136,6 +138,12 @@ void setup() {
       midiChannels[i] = value;
     }
   }
+  for (uint8_t i = 0; i < inputs; i++) {
+    value = EEPROM.read(volumeAddress + i);
+    if (value >= 0 && value <=127) { //valid volume
+      volumes[i] = value;
+    }
+  }
 
   // rotary encoder I/Os
   pinMode(encClk, INPUT);
@@ -202,6 +210,12 @@ void loop () {
       midiChannels[menuitem]++;
       updateDisplay();
     }
+  } else if (up && page == 4) {
+    up = false;
+    if (volumes[menuitem] < 127) {
+      volumes[menuitem]++;
+      updateDisplay();
+    }
   }
 
   if (down && page == 1 && menuitem >= 0) {
@@ -220,6 +234,12 @@ void loop () {
     down = false;
     if (midiChannels[menuitem] > 1) {
       midiChannels[menuitem]--;
+      updateDisplay();
+    }
+  } else if (down && page == 4) {
+    down = false;
+    if (volumes[menuitem] > 1) {
+      volumes[menuitem]--;
       updateDisplay();
     }
   }
@@ -247,6 +267,16 @@ void loop () {
         Serial.println(menuitem);
       }
       EEPROM.update(midiAddress + menuitem, midiChannels[menuitem]);
+    } else if (page ==4) {
+      page = 2; //Return to Switch setting;
+      //write value to EEPROM
+      if (DEBUG) {
+        Serial.print("Writing volume value ");
+        Serial.print(volumes[menuitem]);
+        Serial.print(" to ");
+        Serial.println(menuitem);
+      }
+      EEPROM.update(volumeAddress + menuitem, volumes[menuitem]);
     } else if (page == 9) {
       page = 1;
     }
@@ -260,6 +290,8 @@ void loop () {
       page = 9;
     } else if (page == 2) {
       page = 3;
+    } else if (page == 3) {
+      page = 4;
     }
     updateDisplay();
 
@@ -288,7 +320,7 @@ void loop () {
       // turn LED on:
       turnonLED(i);
       if (!DEBUG) {
-        MIDI.sendNoteOn(notes[i], 100, midiChannels[i]);
+        MIDI.sendNoteOn(notes[i], volumes[i], midiChannels[i]);
       } else {
          Serial.print("ON: ");
          Serial.println(notes[i]);
@@ -455,12 +487,25 @@ void updateDisplay() {
     display.setCursor((84-(nameLength*noteOffset))/2,23);  // (84 - (size*12)) /2  , ((48-14) -16) /2) + 14
     display.setTextSize(2);
     display.print(noteName[notes[menuitem]-noteOffset]);
-    display.setCursor(70,38);
     display.setTextSize(1);
+    display.setCursor(3,30);
+    display.print("Ch");
+    display.setCursor(3,38);
     if (midiChannels[menuitem] < 10) {
       display.print("0");
     }
     display.print(midiChannels[menuitem]);
+    display.setCursor(64,30);
+    display.print("Vol");
+    display.setCursor(64,38);
+
+    if (volumes[menuitem] < 100) {
+      display.print(" ");
+    }
+    if (volumes[menuitem] < 10) {
+      display.print(" ");
+    }
+    display.print(volumes[menuitem]);
     
   } else if (page == 3) {
     display.setCursor(3,3);
@@ -475,6 +520,23 @@ void updateDisplay() {
       display.print("0");
     }
     display.print(midiChannels[menuitem]);
+
+  } else if (page == 4) {
+    display.setCursor(6,3);
+    display.setTextColor(BLACK);
+    display.print("Volume Sw: ");
+    display.print(menuitem+1);
+    display.drawRect(0, 13, 84, 35, BLACK);
+    display.setCursor(24,23);
+    display.setTextSize(2);
+    if (volumes[menuitem] < 100) {
+      display.print("0");
+    }
+    if (volumes[menuitem] < 10) {
+      display.print("0");
+    }
+    display.print(volumes[menuitem]);
+
   } else if (page == 9) {
     display.setTextSize(1);
     for (uint8_t i = 0; i < inputs; i++) {
@@ -483,10 +545,18 @@ void updateDisplay() {
       display.setCursor(12,(i*8));
       display.print(noteName[notes[i]-noteOffset]);
       display.setCursor(36,(i*8));
-      if (midiChannels[menuitem] < 10) {
+      if (midiChannels[i] < 10) {
         display.print("0");
       }
       display.print(midiChannels[i]);
+      display.setCursor(56,(i*8));
+      if (volumes[i] < 100) {
+        display.print(" ");
+      }
+      if (volumes[i] < 10) {
+        display.print(" ");
+      }
+      display.print(volumes[i]);
     }
   }
   display.display();
