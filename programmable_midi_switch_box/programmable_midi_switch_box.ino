@@ -238,7 +238,7 @@ void loop () {
       }
       EEPROM.update(menuitem, notes[menuitem]);
     } else if (page ==3) {
-      page = 1;
+      page = 2 //Return to Switch setting;
       //write value to EEPROM
       if (DEBUG) {
         Serial.print("Writing MIDI channel value ");
@@ -448,6 +448,12 @@ void updateDisplay() {
     display.setCursor((84-(nameLength*noteOffset))/2,23);  // (84 - (size*12)) /2  , ((48-14) -16) /2) + 14
     display.setTextSize(2);
     display.print(noteName[notes[menuitem]-noteOffset]);
+    display.setCursor(70,38);
+    display.setTextSize(1);
+    if (midiChannels[menuitem] < 10) {
+      display.print("0");
+    }
+    display.print(midiChannels[menuitem]);
     
   } else if (page == 3) {
     display.setCursor(3,3);
