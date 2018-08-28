@@ -247,7 +247,7 @@ void loop () {
         Serial.println(menuitem);
       }
       EEPROM.update(midiAddress + menuitem, midiChannels[menuitem]);
-    } else if (page == 4) {
+    } else if (page == 9) {
       page = 1;
     }
     updateDisplay();
@@ -257,7 +257,7 @@ void loop () {
       Serial.println("Long Press");
     }
     if (page == 1) {
-      page = 4;
+      page = 9;
     } else if (page == 2) {
       page = 3;
     }
@@ -475,7 +475,7 @@ void updateDisplay() {
       display.print("0");
     }
     display.print(midiChannels[menuitem]);
-  } else if (page == 4) {
+  } else if (page == 9) {
     display.setTextSize(1);
     for (uint8_t i = 0; i < inputs; i++) {
       display.setCursor(0,(i*8));
