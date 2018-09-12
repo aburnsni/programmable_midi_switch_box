@@ -185,13 +185,8 @@ void setup() {
 }
 
 void loop () {
-  // if (up || down) {
-  //   updateDisplay();
-  // };
 
-  // selectButtonState = digitalRead(encSw);
-  // checkIfSelectButtonIsPressed();
-
+  // Rotary encoder up
   if (up && page == 1) {
     up = false;
     if (menuitem < inputs-1) {
@@ -218,6 +213,7 @@ void loop () {
     }
   }
 
+  // Rotary encoder down
   if (down && page == 1 && menuitem >= 0) {
     down = false;
     if (menuitem > 0) {
@@ -244,6 +240,7 @@ void loop () {
     }
   }
 
+  //Rotary endcoder press
   if (button.shortPress()) {
     if (page == 1 ) {
       page=2;
@@ -296,22 +293,6 @@ void loop () {
     updateDisplay();
 
   }
-  // if (middle) {
-  //   middle = false;
-  //   if (page == 1 ) {
-  //     page=2;
-  //   } else if (page ==2) {
-  //     page = 1;
-  //     //write value to EEPROM
-  //     if (DEBUG) {
-  //       Serial.print("Writing value ");
-  //       Serial.print(notes[menuitem]);
-  //       Serial.print(" to ");
-  //       Serial.println(menuitem);
-  //     }
-  //     EEPROM.update(menuitem, notes[menuitem]);
-  //   }
-  // }
 
   // MIDI play
   for (uint8_t i = 0; i < inputs; i++) {
@@ -366,18 +347,6 @@ void isr() {
     lastInterupTime = interuptTime;
   }
 }
-
-// void checkIfSelectButtonIsPressed()
-// {
-//    if (selectButtonState != lastSelectButtonState) 
-//   {
-//     if (selectButtonState == 0) {
-//       middle=true;
-//     }
-//     delay(50);
-//   }
-//    lastSelectButtonState = selectButtonState;
-// }
 
 void turnBacklightOn() {
   digitalWrite(backlightPin, LOW);
