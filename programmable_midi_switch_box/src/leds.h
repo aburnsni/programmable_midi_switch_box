@@ -1,9 +1,9 @@
 void turnBacklightOn() {
-  digitalWrite(backlightPin, LOW);
+  digitalWrite(backlightPin, HIGH);
 }
 
 void turnBacklightOff() {
-  digitalWrite(backlightPin, HIGH);
+  digitalWrite(backlightPin, LOW);
 }
 
 void turnonLED(uint8_t button) {
