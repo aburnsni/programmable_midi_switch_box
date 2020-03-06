@@ -1,10 +1,10 @@
-const bool DEBUG = 1;
+const bool DEBUG = 0;
 
 //Variables for inputs
-const uint8_t inputs = 6;
-const uint8_t inputPin[inputs] = {A0, A1, A2, A3, A4, A5};
-bool buttonState[inputs] = {1, 1, 1, 1, 1, 1};
-bool playing[inputs] = {false, false, false, false, false, false};  //Is note currently playing
+const uint8_t inputs = 8;
+const uint8_t inputPin[inputs] = {A0, A1, A2, A3, A4, A5, A6, A7};
+bool buttonState[inputs] = {1, 1, 1, 1, 1, 1, 1, 1};
+bool playing[inputs] = {false, false, false, false, false, false, false, false};  //Is note currently playing
 unsigned long lasttrig[inputs];
 uint8_t debounce = 10;
 
@@ -37,9 +37,9 @@ char buffer[5];
 uint8_t value;
 
 // default MIDI notes - replaced from EEPROM
-uint8_t notes[inputs] = {60, 61, 13, 65, 67, 69};
-uint8_t midiChannels[inputs] = {1, 1, 1, 1, 1, 1};
-uint8_t volumes[inputs] = {100, 100, 100, 100, 100, 100};
+uint8_t notes[inputs] = {60, 61, 13, 65, 67, 69, 71, 73};
+uint8_t midiChannels[inputs] = {1, 1, 1, 1, 1, 1, 1, 1};
+uint8_t volumes[inputs] = {100, 100, 100, 100, 100, 100, 100, 100};
 
 // display
 bool backlight = true;
