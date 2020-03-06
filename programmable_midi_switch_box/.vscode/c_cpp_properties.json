@@ -1,16 +1,82 @@
 {
     "configurations": [
         {
+            "name": "!!! WARNING !!! AUTO-GENERATED FILE, PLEASE DO NOT MODIFY IT AND USE https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags"
+        },
+        {
             "name": "Win32",
             "includePath": [
-                "C:\\Users\\Andrew\\AppData\\Local\\Arduino15\\packages\\esp8266\\tools\\**",
-                "C:\\Users\\Andrew\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.5.2\\**"
+                "c:/Users/Andrew/Documents/repos/arduino/programmable_midi_switch_box/programmable_midi_switch_box/include",
+                "c:/Users/Andrew/Documents/repos/arduino/programmable_midi_switch_box/programmable_midi_switch_box/src",
+                "C:/Users/Andrew/.platformio/lib/Adafruit PCD8544 Nokia 5110 LCD library_ID81",
+                "C:/Users/Andrew/.platformio/lib/Adafruit GFX Library_ID13",
+                "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "C:/Users/Andrew/.platformio/lib/dual-function-button-master",
+                "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                "C:/Users/Andrew/.platformio/lib/MIDI Library_ID62/src",
+                "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/variants/eightanaloginputs",
+                "C:/Users/Andrew/.platformio/lib/MIDIUSB_ID1104/src",
+                "C:/Users/Andrew/.platformio/lib/Adafruit MPR121_ID839",
+                "C:/Users/Andrew/.platformio/lib/Adafruit SSD1306_ID135",
+                "C:/Users/Andrew/.platformio/lib/ESP32 BLE Arduino_ID1841/src",
+                "C:/Users/Andrew/.platformio/lib/ESP8266_SSD1306_ID562/src",
+                "C:/Users/Andrew/.platformio/lib/IRremote_ID4",
+                "C:/Users/Andrew/.platformio/lib/LiquidCrystal_ID887/src",
+                "C:/Users/Andrew/.platformio/lib/NeoPixelBus_ID547/src",
+                "C:/Users/Andrew/.platformio/lib/Shifty_ID801/src",
+                "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                "C:/Users/Andrew/.platformio/packages/tool-unity",
+                ""
             ],
-            "forcedInclude": [],
-            "intelliSenseMode": "msvc-x64",
-            "compilerPath": "/usr/bin/gcc",
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "c:/Users/Andrew/Documents/repos/arduino/programmable_midi_switch_box/programmable_midi_switch_box/include",
+                    "c:/Users/Andrew/Documents/repos/arduino/programmable_midi_switch_box/programmable_midi_switch_box/src",
+                    "C:/Users/Andrew/.platformio/lib/Adafruit PCD8544 Nokia 5110 LCD library_ID81",
+                    "C:/Users/Andrew/.platformio/lib/Adafruit GFX Library_ID13",
+                    "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                    "C:/Users/Andrew/.platformio/lib/dual-function-button-master",
+                    "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                    "C:/Users/Andrew/.platformio/lib/MIDI Library_ID62/src",
+                    "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/cores/arduino",
+                    "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/variants/eightanaloginputs",
+                    "C:/Users/Andrew/.platformio/lib/MIDIUSB_ID1104/src",
+                    "C:/Users/Andrew/.platformio/lib/Adafruit MPR121_ID839",
+                    "C:/Users/Andrew/.platformio/lib/Adafruit SSD1306_ID135",
+                    "C:/Users/Andrew/.platformio/lib/ESP32 BLE Arduino_ID1841/src",
+                    "C:/Users/Andrew/.platformio/lib/ESP8266_SSD1306_ID562/src",
+                    "C:/Users/Andrew/.platformio/lib/IRremote_ID4",
+                    "C:/Users/Andrew/.platformio/lib/LiquidCrystal_ID887/src",
+                    "C:/Users/Andrew/.platformio/lib/NeoPixelBus_ID547/src",
+                    "C:/Users/Andrew/.platformio/lib/Shifty_ID801/src",
+                    "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                    "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                    "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    "C:/Users/Andrew/.platformio/packages/tool-unity",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=40201",
+                "ARDUINO_AVR_NANO",
+                "F_CPU=16000000L",
+                "ARDUINO_ARCH_AVR",
+                "ARDUINO=10808",
+                "__AVR_ATmega328P__",
+                ""
+            ],
+            "intelliSenseMode": "clang-x64",
             "cStandard": "c11",
-            "cppStandard": "c++17"
+            "cppStandard": "c++11",
+            "compilerPath": "C:/Users/Andrew/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe",
+            "compilerArgs": [
+                "-mmcu=atmega328p",
+                ""
+            ]
         }
     ],
     "version": 4
