@@ -1,4 +1,4 @@
-const bool DEBUG = 0;
+const bool DEBUG = 1;
 
 //Variables for inputs
 const uint8_t inputs = 6;
@@ -21,9 +21,9 @@ uint8_t lastCount = 0;
 bool swState = true;
 
 // Pins for hc595 to drive LEDs
-const uint8_t ledClockPin = 10;
+const uint8_t ledClockPin = 12;
 const uint8_t ledLatchPin = 11;
-const uint8_t ledDataPin = 12;
+const uint8_t ledDataPin = 10;
 byte ledBits = B00000000;
 
 // Note names matched to MIDI value
