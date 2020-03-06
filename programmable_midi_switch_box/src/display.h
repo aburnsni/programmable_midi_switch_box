@@ -130,6 +130,7 @@ void updateDisplay() {
 
   } else if (page == 9) {
     display.setTextSize(1);
+    display.setTextColor(BLACK, WHITE);
     for (uint8_t i = 0; i < inputs; i++) {
       display.setCursor(0,(i*8));
       display.print(i);
