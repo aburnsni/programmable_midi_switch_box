@@ -8,10 +8,10 @@
             "includePath": [
                 "c:/Users/Andrew/Documents/repos/arduino/programmable_midi_switch_box/programmable_midi_switch_box/include",
                 "c:/Users/Andrew/Documents/repos/arduino/programmable_midi_switch_box/programmable_midi_switch_box/src",
+                "C:/Users/Andrew/.platformio/lib/MIDI Library_ID62/src",
                 "C:/Users/Andrew/.platformio/lib/Adafruit PCD8544 Nokia 5110 LCD library_ID81",
                 "C:/Users/Andrew/.platformio/lib/Adafruit GFX Library_ID13",
                 "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
-                "C:/Users/Andrew/.platformio/lib/MIDI Library_ID62/src",
                 "C:/Users/Andrew/.platformio/lib/dual-function-button-master",
                 "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
                 "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/cores/arduino",
@@ -36,10 +36,10 @@
                 "path": [
                     "c:/Users/Andrew/Documents/repos/arduino/programmable_midi_switch_box/programmable_midi_switch_box/include",
                     "c:/Users/Andrew/Documents/repos/arduino/programmable_midi_switch_box/programmable_midi_switch_box/src",
+                    "C:/Users/Andrew/.platformio/lib/MIDI Library_ID62/src",
                     "C:/Users/Andrew/.platformio/lib/Adafruit PCD8544 Nokia 5110 LCD library_ID81",
                     "C:/Users/Andrew/.platformio/lib/Adafruit GFX Library_ID13",
                     "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
-                    "C:/Users/Andrew/.platformio/lib/MIDI Library_ID62/src",
                     "C:/Users/Andrew/.platformio/lib/dual-function-button-master",
                     "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
                     "C:/Users/Andrew/.platformio/packages/framework-arduino-avr/cores/arduino",
