@@ -6,10 +6,11 @@ void isr() {
   // Debounce signals to 5ms
   if (interuptTime - lastInterupTime > 5) {
     if (digitalRead(encDt) == LOW) {
-      up = true;
+      change = -1;
     } else {
-      down = true;
+      change = 1;
     }
+
     lastInterupTime = interuptTime;
   }
 }

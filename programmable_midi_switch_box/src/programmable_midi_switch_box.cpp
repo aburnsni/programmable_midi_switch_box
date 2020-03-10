@@ -112,60 +112,45 @@ void setup() {
 
 void loop () {
 
-  // Rotary encoder up
-  if (up && page == 1) {
-    up = false;
-    if (menuitem < inputs-1) {
-      menuitem++;
-      updateDisplay();
+  if (change != 0) {
+    if (DEBUG) {
+      Serial.print(page);
+      Serial.print("\t");
+      Serial.print(menuitem);
+      Serial.print("\t");
+      Serial.print(notes[menuitem]);
+      Serial.print("\t");
+      Serial.println(change);
     }
-  } else if (up && page == 2) {
-    up = false;
-    if (notes[menuitem] < 127) {
-      notes[menuitem]++;
-      updateDisplay();
+    // Rotary encoder up
+    if (page == 1) {
+      if ((menuitem >= 0) && (menuitem <= inputs-1)) {
+        menuitem = menuitem + change;
+        if (menuitem < 0) { menuitem++; }
+        if (menuitem > inputs-1) { menuitem--; }
+      }
+    } else if (page == 2) {
+      if ((notes[menuitem] >= 0) && (notes[menuitem] <= 127)) {
+        notes[menuitem] = notes[menuitem] + change;;
+        if (notes[menuitem] < 0) { notes[menuitem]++; }
+        if (notes[menuitem] > 127) { notes[menuitem]--; }
+      }
+    } else if (page == 3) {
+      if ((midiChannels[menuitem] >= 1) && (midiChannels[menuitem] <= 16)) {
+        midiChannels[menuitem] = midiChannels[menuitem] + change;
+        if (midiChannels[menuitem] < 1) { midiChannels[menuitem]++; }
+        if (midiChannels[menuitem] > 16) { midiChannels[menuitem]--; }
+      }
+    } else if (page == 4) {
+      if ((volumes[menuitem] >= 1) && (volumes[menuitem] <= 127)) {
+        volumes[menuitem] = volumes[menuitem] + change;
+        if (volumes[menuitem] < 1) { volumes[menuitem]++; }
+        if (volumes[menuitem] > 127) { volumes[menuitem]--; }
+      }
     }
-  } else if (up && page == 3) {
-    up = false;
-    if (midiChannels[menuitem] < 16) {
-      midiChannels[menuitem]++;
-      updateDisplay();
-    }
-  } else if (up && page == 4) {
-    up = false;
-    if (volumes[menuitem] < 127) {
-      volumes[menuitem]++;
-      updateDisplay();
-    }
+    updateDisplay();
+    change = 0;
   }
-
-  // Rotary encoder down
-  if (down && page == 1) {
-    down = false;
-    if (menuitem > 0) {
-      menuitem--;
-      updateDisplay();
-    }
-  } else if (down && page == 2) {
-    down = false;
-    if (notes[menuitem] > 0) {
-      notes[menuitem]--;
-      updateDisplay();
-    }
-  } else if (down && page == 3) {
-    down = false;
-    if (midiChannels[menuitem] > 1) {
-      midiChannels[menuitem]--;
-      updateDisplay();
-    }
-  } else if (down && page == 4) {
-    down = false;
-    if (volumes[menuitem] > 1) {
-      volumes[menuitem]--;
-      updateDisplay();
-    }
-  }
-
   //Rotary endcoder press
   if (button.shortPress()) {
     if (page == 1 ) {

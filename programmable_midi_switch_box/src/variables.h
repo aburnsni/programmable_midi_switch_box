@@ -1,4 +1,4 @@
-const bool DEBUG = 0;
+const bool DEBUG = 1;
 
 //Variables for inputs
 const uint8_t inputs = 6;
@@ -15,7 +15,7 @@ const uint8_t encSw = 4;
 
 volatile boolean up = false;
 volatile boolean down = false;
-volatile boolean middle = false;
+volatile int change = 0;
 
 uint8_t lastCount = 0;
 bool swState = true;
@@ -37,9 +37,9 @@ char buffer[5];
 uint8_t value;
 
 // default MIDI notes - replaced from EEPROM
-uint8_t notes[inputs] = {60, 61, 13, 65, 67, 69};
-uint8_t midiChannels[inputs] = {1, 1, 1, 1, 1, 1};
-uint8_t volumes[inputs] = {100, 100, 100, 100, 100, 100};
+int notes[inputs] = {60, 61, 13, 65, 67, 69};
+int midiChannels[inputs] = {1, 1, 1, 1, 1, 1};
+int volumes[inputs] = {100, 100, 100, 100, 100, 100};
 
 // display
 bool backlight = true;
@@ -50,4 +50,4 @@ const int backlightTimeOut = 30 * 1000;  // 30 second timeout on backlight
 
 // Menu
 uint8_t page = 1;
-uint8_t menuitem = 0;
+int menuitem = 0;
