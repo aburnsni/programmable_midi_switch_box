@@ -140,7 +140,7 @@ void loop () {
   }
 
   // Rotary encoder down
-  if (down && page == 1 && menuitem >= 0) {
+  if (down && page == 1) {
     down = false;
     if (menuitem > 0) {
       menuitem--;
