@@ -1,4 +1,5 @@
 const bool DEBUG = 0;
+const bool usbmidi = 0;
 
 //Variables for inputs
 const uint8_t inputs = 6;
@@ -14,7 +15,7 @@ const uint8_t encDt = 3;
 const uint8_t encSw = 4;
 
 volatile int change = 0;
-
+long encPostition  = -999;
 bool swState = true;
 
 // Pins for hc595 to drive LEDs
