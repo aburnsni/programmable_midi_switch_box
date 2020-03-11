@@ -1,6 +1,6 @@
 // MIDI tx
-// lcd pins 4, 5, 6, 7, 8, 9
-// rotary enc pins 2, 3, A7
+// lcd pins 5, 6, 7, 8, 9
+// rotary enc pins 2, 3, 4
 // switch inputs A0, A1, A2, A3, A4, A5
 // hc595 driven leds 10, 11, 12
 #include <Arduino.h>
@@ -12,20 +12,24 @@
 #include <Adafruit_PCD8544.h>
 #include "DualFunctionButton.h"
 #include <avr/pgmspace.h>
+#define ENCODER_OPTIMIZE_INTERRUPTS
+#include <Encoder.h>
 
 #include "notes.h"
 #include "ablogo.h"
 #include "variables.h"
+#include "numtobits.h"
+#include "leds.h"
+
+Encoder encKnob(encClk, encDt);
 
 DualFunctionButton button(encSw, 1000, INPUT_PULLUP);
+
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
-Adafruit_PCD8544 display = Adafruit_PCD8544(8, 7, 6, 5); // pin CS (labelled CE) tied to GND
 
-byte myfnNumToBits(int someNumber);
+Adafruit_PCD8544 display = Adafruit_PCD8544(8, 7, 6, 5); // pin CS (labelled CE) tied to GND, BL on Pin 9
 
-#include "leds.h"
 #include "display.h"
-#include "interupts.h"
 
 void setup() {
   // hc595 I/Os
@@ -38,7 +42,7 @@ void setup() {
   digitalWrite(ledLatchPin, HIGH); // update display
 
   MIDI.begin();
-  if (DEBUG) {
+  if (DEBUG || usbmidi) {
     Serial.begin(115200);
   }
   // Switch inputs with pullups
@@ -54,7 +58,7 @@ void setup() {
   //read EEPROM values
   for (uint8_t i = 0; i < inputs; i++) {
     value = EEPROM.read(i);
-    if (value > 11 && value < 128) {
+    if (value >= 0 && value <= 127) {
       notes[i] = value;
     }
   }
@@ -72,10 +76,7 @@ void setup() {
   }
 
   // rotary encoder I/Os
-  pinMode(encClk, INPUT);
-  pinMode(encDt, INPUT);
   pinMode(encSw, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(encClk), isr, LOW);
 
   // display
   pinMode(backlightPin, OUTPUT);
@@ -112,60 +113,59 @@ void setup() {
 
 void loop () {
 
-  // Rotary encoder up
-  if (up && page == 1) {
-    up = false;
-    if (menuitem < inputs-1) {
-      menuitem++;
-      updateDisplay();
+  long newEncPosition = encKnob.read()/2;
+  if (newEncPosition != encPostition) {
+    if (newEncPosition > encPostition) {
+      change = -1;
+    } else if (newEncPosition < encPostition) {
+      change = 1;
     }
-  } else if (up && page == 2) {
-    up = false;
-    if (notes[menuitem] < 127) {
-      notes[menuitem]++;
-      updateDisplay();
-    }
-  } else if (up && page == 3) {
-    up = false;
-    if (midiChannels[menuitem] < 16) {
-      midiChannels[menuitem]++;
-      updateDisplay();
-    }
-  } else if (up && page == 4) {
-    up = false;
-    if (volumes[menuitem] < 127) {
-      volumes[menuitem]++;
-      updateDisplay();
-    }
+    encPostition = newEncPosition;
   }
 
-  // Rotary encoder down
-  if (down && page == 1) {
-    down = false;
-    if (menuitem > 0) {
-      menuitem--;
-      updateDisplay();
+  if (change != 0) {
+    if (DEBUG) {
+      Serial.print(page);
+      Serial.print("\t");
+      Serial.print(menuitem);
+      Serial.print("\t");
+      Serial.print(notes[menuitem]);
+      Serial.print("\t");
+      Serial.print(midiChannels[menuitem]);
+      Serial.print("\t");
+      Serial.print(volumes[menuitem]);
+      Serial.print("\t");
+      Serial.println(change);
     }
-  } else if (down && page == 2) {
-    down = false;
-    if (notes[menuitem] > 0) {
-      notes[menuitem]--;
-      updateDisplay();
+    // Rotary encoder up
+    if (page == 1) {
+      if ((menuitem >= 0) && (menuitem <= inputs-1)) {
+        if (!((menuitem == 0 && change < 0) || (menuitem == inputs-1 && change > 0))) {
+          menuitem = menuitem + change;
+        }
+      }
+    } else if (page == 2) {
+      if ((notes[menuitem] >= 0) && (notes[menuitem] <= 127)) {
+        if (!((notes[menuitem] == 0 && change < 0) || (notes[menuitem] == 127 && change > 0))) {
+          notes[menuitem] = notes[menuitem] + change;
+        }
+      }
+    } else if (page == 3) {
+      if ((midiChannels[menuitem] >= 1) && (midiChannels[menuitem] <= 16)) {
+        if (!((midiChannels[menuitem] == 1 && change < 0) || (midiChannels[menuitem] == 16 && change > 0))) {
+          midiChannels[menuitem] = midiChannels[menuitem] + change;
+        }
+      }
+    } else if (page == 4) {
+      if ((volumes[menuitem] >= 1) && (volumes[menuitem] <= 127)) {
+        if (!((volumes[menuitem] == 1 && change < 0) || (volumes[menuitem] == 127 && change > 0))) {
+          volumes[menuitem] = volumes[menuitem] + change;
+        }
+      }
     }
-  } else if (down && page == 3) {
-    down = false;
-    if (midiChannels[menuitem] > 1) {
-      midiChannels[menuitem]--;
-      updateDisplay();
-    }
-  } else if (down && page == 4) {
-    down = false;
-    if (volumes[menuitem] > 1) {
-      volumes[menuitem]--;
-      updateDisplay();
-    }
+    updateDisplay();
+    change = 0;
   }
-
   //Rotary endcoder press
   if (button.shortPress()) {
     if (page == 1 ) {
@@ -248,31 +248,5 @@ void loop () {
 
   if (millis()-backlightTrig > backlightTimeOut) {
     turnBacklightOff();
-  }
-}
-
-byte myfnNumToBits(int someNumber) {
-  switch (someNumber) {
-    case 0:
-      return B00000001;
-      break;
-    case 1:
-      return B00000010;
-      break;
-    case 2:
-      return B00000100;
-      break;
-    case 3:
-      return B00001000;
-      break;
-    case 4:
-      return B00010000;
-      break;
-    case 5:
-      return B00100000;
-      break;
-    default:
-      return B00000000; // Error condition, displays three vertical bars
-      break;   
   }
 }
