@@ -1,4 +1,4 @@
-const bool DEBUG = 1;
+const bool DEBUG = 0;
 
 //Variables for inputs
 const uint8_t inputs = 6;
@@ -13,11 +13,8 @@ const uint8_t encClk = 2; // Needs Interupt pin
 const uint8_t encDt = 3;
 const uint8_t encSw = 4;
 
-volatile boolean up = false;
-volatile boolean down = false;
 volatile int change = 0;
 
-uint8_t lastCount = 0;
 bool swState = true;
 
 // Pins for hc595 to drive LEDs

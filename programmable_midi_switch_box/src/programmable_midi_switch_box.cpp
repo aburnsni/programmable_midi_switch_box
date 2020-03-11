@@ -13,6 +13,9 @@
 #include "DualFunctionButton.h"
 #include <avr/pgmspace.h>
 
+#define ENCODER_OPTIMIZE_INTERRUPTS
+#include <Encoder.h>
+
 #include "notes.h"
 #include "ablogo.h"
 #include "variables.h"
@@ -20,6 +23,9 @@
 DualFunctionButton button(encSw, 1000, INPUT_PULLUP);
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
 Adafruit_PCD8544 display = Adafruit_PCD8544(8, 7, 6, 5); // pin CS (labelled CE) tied to GND
+
+Encoder encKnob(encClk, encDt);
+long encPostition  = -999;
 
 byte myfnNumToBits(int someNumber);
 
@@ -72,10 +78,7 @@ void setup() {
   }
 
   // rotary encoder I/Os
-  pinMode(encClk, INPUT);
-  pinMode(encDt, INPUT);
   pinMode(encSw, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(encClk), isr, LOW);
 
   // display
   pinMode(backlightPin, OUTPUT);
@@ -111,6 +114,16 @@ void setup() {
 }
 
 void loop () {
+
+  long newEncPosition = encKnob.read()/2;
+  if (newEncPosition != encPostition) {
+    if (newEncPosition > encPostition) {
+      change = -1;
+    } else if (newEncPosition < encPostition) {
+      change = 1;
+    }
+    encPostition = newEncPosition;
+  }
 
   if (change != 0) {
     if (DEBUG) {
